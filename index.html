@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scotland Offsite — Pick a Lane</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#181b22; --card2:#1f232c; --ink:#e9edf3; --mut:#9aa4b2;
+    --line:#2a2f3a; --good:#3fb950; --warn:#e3b341; --bad:#f85149; --accent:#58a6ff;
+    --accentdim:#1f3a5f;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:18px 14px 160px;}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{font-size:24px;margin:0 0 2px;letter-spacing:-.3px}
+  .sub{color:var(--mut);font-size:14px;margin:0 0 18px}
+  .sub b{color:var(--ink)}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+  .panel h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:0 0 10px;font-weight:700}
+  /* toggles */
+  .seg{display:inline-flex;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+  .seg button{background:none;border:0;color:var(--mut);padding:8px 12px;border-radius:8px;font-size:13.5px;cursor:pointer;font-weight:600}
+  .seg button.on{background:var(--accent);color:#06101f}
+  .chip{display:inline-flex;align-items:center;gap:9px;background:var(--card2);border:1px solid var(--line);
+    border-radius:10px;padding:9px 13px;cursor:pointer;font-size:13.5px;user-select:none;font-weight:600}
+  .chip .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--mut);display:grid;place-items:center;font-size:12px;color:#06101f}
+  .chip.on{border-color:var(--accent);color:#fff}
+  .chip.on .box{background:var(--accent);border-color:var(--accent)}
+  .chip small{color:var(--mut);font-weight:500}
+  .lbl{font-size:12.5px;color:var(--mut);margin-right:4px;font-weight:600}
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .opt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;position:relative;
+    cursor:pointer;transition:.15s;display:flex;flex-direction:column;min-height:100%}
+  .opt:hover{border-color:#3a4456}
+  .opt.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent), 0 8px 30px -12px var(--accent)}
+  .opt.dim{opacity:.38;filter:grayscale(.4)}
+  .opt .name{font-size:17px;font-weight:700;margin:0}
+  .opt .tag{font-size:12px;color:var(--mut);margin:2px 0 12px}
+  .price{font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1}
+  .price small{font-size:13px;font-weight:600;color:var(--mut)}
+  .delta{font-size:12.5px;margin-top:5px;font-weight:600}
+  .lines{list-style:none;padding:0;margin:12px 0 0;font-size:12.5px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px}
+  .lines li{display:flex;justify-content:space-between;padding:2px 0}
+  .lines li span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
+  .flags{margin-top:11px;display:flex;flex-direction:column;gap:6px}
+  .flag{font-size:11.5px;line-height:1.35;padding:6px 9px;border-radius:8px;display:flex;gap:7px;align-items:flex-start}
+  .flag.r{background:rgba(248,81,73,.1);color:#ffb3ae}
+  .flag.y{background:rgba(227,179,65,.1);color:#f0d089}
+  .flag.g{background:rgba(63,185,80,.1);color:#88e09a}
+  .badge{position:absolute;top:-9px;right:12px;background:var(--good);color:#06140a;font-size:11px;
+    font-weight:800;padding:3px 9px;border-radius:20px;letter-spacing:.02em}
+  .badge.unavail{background:var(--bad);color:#2a0605}
+  .pickbtn{margin-top:12px;background:var(--card2);border:1px solid var(--line);color:var(--ink);
+    border-radius:9px;padding:9px;font-weight:700;font-size:13px;cursor:pointer}
+  .opt.sel .pickbtn{background:var(--accent);color:#06101f;border-color:var(--accent)}
+  /* sticky verdict */
+  .dock{position:fixed;left:0;right:0;bottom:0;background:rgba(15,17,21,.92);backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);padding:12px 14px;z-index:20}
+  .dock .inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+  .total{font-size:15px;font-weight:600}
+  .total b{font-size:24px;font-weight:800;letter-spacing:-.4px}
+  .meter{flex:1;min-width:200px;max-width:420px}
+  .bar{height:9px;background:var(--card2);border-radius:6px;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar i{position:absolute;top:0;bottom:0;left:0;border-radius:6px;transition:.3s}
+  .ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:3px}
+  .status{font-weight:800;font-size:14px}
+  /* questions + actions */
+  .q{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .q:last-child{border:0}
+  .q .n{background:var(--accentdim);color:var(--accent);font-weight:800;font-size:12px;min-width:22px;height:22px;
+    border-radius:6px;display:grid;place-items:center;margin-top:1px}
+  .q b{color:var(--ink)}
+  .act{font-size:13.5px;padding:7px 0;display:flex;gap:9px;align-items:flex-start;color:var(--mut)}
+  .act .d{color:var(--bad);font-weight:800;margin-top:-1px}
+  .act b{color:var(--ink)}
+  details{margin-top:8px}
+  summary{cursor:pointer;font-size:12.5px;color:var(--accent);font-weight:600}
+  .foot{color:var(--mut);font-size:11.5px;margin-top:14px;line-height:1.5}
+  a{color:var(--accent)}
+  @media(max-width:560px){ .price{font-size:24px} h1{font-size:21px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Scotland Offsite — Pick a Lane</h1>
+  <p class="sub">5 people · Thu–Sun working long weekend · house held Tue–Sun (5 nights) · budget floor <b>$10K</b>, ceiling <b>$15K</b>. Toggle the upgrades and weekend; the total moves live. Tap a card to choose.</p>
+
+  <div class="panel">
+    <h2>Set the scenario</h2>
+    <div class="row" style="gap:16px">
+      <div>
+        <div class="lbl">Weekend</div>
+        <div class="seg" id="wk">
+          <button data-wk="late" class="on">Jul 30 – Aug 2</button>
+          <button data-wk="early">Jul 23 – 26</button>
+        </div>
+      </div>
+      <div>
+        <div class="lbl">US arrival (Michelle + Tony)</div>
+        <div class="seg" id="arr">
+          <button data-arr="tue" class="on">Tue · 5 nt</button>
+          <button data-arr="wed">Wed · 4 nt</button>
+        </div>
+      </div>
+      <div>
+        <div class="lbl">Upgrades</div>
+        <div class="row">
+          <div class="chip" id="pe"><span class="box">✓</span> Premium economy <small>· 2 long-hauls (est +$1,900)</small></div>
+          <div class="chip" id="chef"><span class="box">✓</span> Private chef night <small>· (est +$550)</small></div>
+        </div>
+      </div>
+    </div>
+    <p id="wknote" class="foot" style="margin-top:10px"></p>
+    <p id="arrnote" class="foot" style="margin-top:6px"></p>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="panel" style="margin-top:14px">
+    <h2>Also found — other booking sites (live, Jun 25)</h2>
+    <p class="foot" style="margin:0 0 12px">Searched Booking.com + Vrbo for the same dates. Two reframe the Edinburgh question, one saves money on a shortlisted house. House prices are fees-included for 5 nights; add ~$3,100 ground + ~$3,450 flights for all-in. <b>Verify bed/bath config before booking — aggregator listing data can be glitchy.</b></p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="text-align:left;color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.05em">
+        <th style="padding:6px 8px 6px 0">Property</th><th style="padding:6px 8px">Where</th><th style="padding:6px 8px">House 5nt</th><th style="padding:6px 8px">~All-in</th><th style="padding:6px 8px">Read</th></tr></thead>
+      <tbody style="vertical-align:top">
+        <tr style="border-top:1px solid var(--line)">
+          <td style="padding:9px 8px 9px 0"><b>Dreghorn House</b><br><span style="color:var(--mut)">5 BR · 9 beds · 2 bath</span></td>
+          <td style="padding:9px 8px">Edinburgh, 3.4 mi out</td>
+          <td style="padding:9px 8px;color:var(--good);font-weight:700">$3,944</td>
+          <td style="padding:9px 8px"><b>~$10.5K</b></td>
+          <td style="padding:9px 8px">Booking.com ★7.6 (32). <b>Cheapest 5-bed found anywhere</b> — brings an in-Edinburgh house ~$2K under Glasgow. Trade-off: only 2 baths for 5, modest score. +5% city levy (~$200).</td>
+        </tr>
+        <tr style="border-top:1px solid var(--line)">
+          <td style="padding:9px 8px 9px 0"><b>Luxurious Townhouse + Hot Tub</b><br><span style="color:var(--mut)">5 BR · 3 bath · 2,357 ft²</span></td>
+          <td style="padding:9px 8px">Prestonfield, 1.7 mi out</td>
+          <td style="padding:9px 8px;color:var(--good);font-weight:700">$4,424</td>
+          <td style="padding:9px 8px"><b>~$11K</b></td>
+          <td style="padding:9px 8px">Booking.com, new listing (no reviews) — same venue-risk as the Grange. Nicer + closer-in than Dreghorn, 3 baths, hot tub. +5% city levy (~$220).</td>
+        </tr>
+        <tr style="border-top:1px solid var(--line)">
+          <td style="padding:9px 8px 9px 0"><b>Old Mill (same house, other channel)</b><br><span style="color:var(--mut)">via Booking.com</span></td>
+          <td style="padding:9px 8px">Dalkeith</td>
+          <td style="padding:9px 8px;color:var(--good);font-weight:700">$6,693</td>
+          <td style="padding:9px 8px"><b>~$13.2K</b></td>
+          <td style="padding:9px 8px">Identical to the Old Mill card above — <b>~$1,200 cheaper on Booking.com</b> than Airbnb's $7,919. Verify it's the same property + dates.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="foot" style="margin-top:10px"><b>The takeaway:</b> "Edinburgh = $17K" only holds if you insist on the ★4.98 premium townhouse. A 5-bed in Edinburgh proper runs ~$3.9–4.4K (≈$10.5–11K all-in) — cheaper than Glasgow. The premium is the postcode <em>and</em> the polish, not the city itself. Vrbo skewed to 3–4 bed central apartments (e.g. a 4-BR central flat ~$3,400/5nt) if you'd trade a bedroom for a lower price.</p>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <h2>What Marvin actually decides</h2>
+    <div class="q"><span class="n">1</span><div><b>Which of the four.</b> The card you pick above.</div></div>
+    <div class="q"><span class="n">2</span><div><b>Which weekend.</b> Default Jul 30–Aug 2 clears both personal constraints — Michelle's childcare (Johnny's traveling, back the 26th) and Sofia's family visit (in until ~Jul 19, which is why the week of Jul 14 was dropped). Jul 23–26 is tentative because Johnny's still away.</div></div>
+    <div class="q"><span class="n">3</span><div><b>Upgrades.</b> Premium economy for the two long-hauls, a chef night, both, or neither — see what still fits under $15K above.</div></div>
+    <div class="q"><span class="n">4</span><div><b>Go / no-go</b>, decided mid-week, with a virtual fallback if it's a no.</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Before anyone books — these clocks are already running</h2>
+    <div class="act"><span class="d">▲</span><div><b>Decide by ~July 1.</b> Every week of waiting costs real money in transatlantic fare creep, not just flexibility. We're ~5 weeks out — the edge of the good booking window.</div></div>
+    <div class="act"><span class="d">▲</span><div><b>Michelle + Tony apply for UK ETA now</b> — required to board as of Feb 25, 2026. £20 each, usually instant but can take up to 3 working days if flagged. Independent of which lane wins.</div></div>
+    <div class="act"><span class="d">▲</span><div><b>Lock the two US seats first.</b> They're ~$2,500 of the ~$3,450 flight total and the same seats apply to both candidate weekends. A changeable fare hedges the date question.</div></div>
+    <div class="act"><span class="d">▲</span><div><b>Hold the house on a Moderate/Flexible cancellation policy</b> while Marvin decides. The 30-day free-cancel line on Firm-policy listings is right about now — don't deposit on a Firm/Limited house pre-decision.</div></div>
+    <div class="act"><span class="d">▲</span><div><b>Name 2–3 outcomes the weekend must produce.</b> An offsite with no agenda is the biggest hidden risk. Marvin sets the outcomes; someone other than Marvin facilitates.</div></div>
+    <details><summary>See the full adversarial risk punch-list (venue, levy, weather, connectivity, insurance…)</summary>
+      <div class="foot" style="color:var(--ink)" id="risklist"></div>
+    </details>
+  </div>
+
+  <p class="foot">
+    Airbnb prices are <b>live, fees-included totals pulled Jun 25, 2026</b> for a 5-night stay (Glasgow/Old Mill/Grange at Jul 28–Aug 2; Edinburgh at Jul 27–Aug 1, its only available window). Ground ($3,100) and flights ($3,450 economy) are planning estimates; so are the upgrades — premium-economy transatlantic upgrades and a private-chef dinner vary, confirm before relying on them. The 5% Edinburgh visitor levy (live Jul 24, 2026, whole-home stays, capped at the first 5 nights) applies only to the Edinburgh option — confirm whether it's inside the $10,315 or added at checkout; Dalkeith and the Borders are outside the City of Edinburgh and are <b>not</b> levied. Re-pull prices right before booking. Sources: gov.uk/eta · edinburgh.gov.uk/visitorlevy.
+  </p>
+</div>
+
+<div class="dock">
+  <div class="inner">
+    <div class="total">Pick: <b id="pickName">—</b> &nbsp;·&nbsp; All-in <b id="totalNum">—</b></div>
+    <div class="meter">
+      <div class="bar"><i id="fill"></i></div>
+      <div class="ticks"><span>$10K floor</span><span>$15K ceiling</span></div>
+    </div>
+    <div class="status" id="statusTxt">Choose a lane ↑</div>
+  </div>
+</div>
+
+<script>
+const PE=1900, CHEF=550, GROUND=3100, FLIGHTS=3450;
+// airbnb = LIVE fees-included price pulled Jun 25, 2026 for the 5-night stay
+const opts=[
+  {id:'glasgow', name:'Glasgow', tag:'City · value pick · flexible dates',
+    aTue:5898, aWed:5078, ground:GROUND, flights:FLIGHTS, rec:true, edinburghOnly:false,
+    flags:[['g','Live price $5,898 all-in (5 nt) — Guest Favourite ★4.91, 174 reviews. Free cancellation before Jul 23.'],
+           ['g','Walkable city, trains everywhere — no car needed.'],
+           ['g','Cheapest lane; the only one with room for an upgrade under $15K.']]},
+  {id:'oldmill', name:'Old Mill, Dalkeith', tag:'Premium house · ~20 min from Edinburgh',
+    aTue:7919, aWed:6675, ground:GROUND, flights:FLIGHTS, rec:false, edinburghOnly:false,
+    flags:[['g','Live price $7,919 all-in (down from $9,767) — Superhost ★5.0. Eskbank rail + buses, car optional.'],
+           ['g','CHEAPER on Booking.com: same house ~$6,693 (save ~$1,200). Confirm identical property + dates before booking there.'],
+           ['g','Outside Edinburgh council = no visitor levy.']]},
+  {id:'grange', name:'The Grange, Borders', tag:'Secluded · car required · near Heriot',
+    aTue:7714, aWed:6170, ground:GROUND, flights:FLIGHTS, rec:false, edinburghOnly:false,
+    flags:[['y','UPDATE: now has its FIRST review (was zero). Still new (host 2 months) — verify WiFi speed-test in writing + STL licence # before booking; the house IS the venue.'],
+           ['r','Car required, ~45 min from airport, no rail. Who drives, left-side, after a redeye?'],
+           ['g','Live price $7,714 all-in — 7 bed, indoor pool. Midges late July near water; fine for an indoor plan.']]},
+  {id:'edinburgh', name:'Edinburgh', tag:'His city · ONLY Jul 27–Aug 1',
+    aTue:10315, aWed:10315, ground:GROUND, flights:FLIGHTS, rec:false, edinburghOnly:true,
+    flags:[['r','Default Jul 28–Aug 2 is NOT available — live calendar only allows ~Jul 27–Aug 1 (shifts arrival days).'],
+           ['r','OVER the $15K ceiling by ~$2K before any upgrade. Confirm whether the 5% levy (~$500) is in the $10,315 or added at checkout.'],
+           ['y','★4.98, "usually booked." Same walkable weekend as Glasgow for ~$5K more.']]}
+];
+function recompute(){ opts.forEach(o=>{ o.airbnb=(state.arrival==='wed'?o.aWed:o.aTue); o.base=o.airbnb+o.ground+o.flights; }); }
+
+let state={wk:'late', arrival:'tue', pe:false, chef:false, sel:null};
+const CEIL=15000, FLOOR=10000;
+const fmt=n=>'$'+Math.round(n).toLocaleString();
+
+function addons(){return (state.pe?PE:0)+(state.chef?CHEF:0);}
+function totalFor(o){return o.base+addons();}
+
+function render(){
+  const grid=document.getElementById('grid'); grid.innerHTML='';
+  opts.forEach(o=>{
+    const unavail = (state.wk==='early' && o.edinburghOnly);
+    const t=totalFor(o);
+    const over=t-CEIL;
+    const el=document.createElement('div');
+    el.className='opt'+(state.sel===o.id?' sel':'')+(unavail?' dim':'');
+    el.onclick=()=>{ if(unavail) return; state.sel=o.id; render(); dock(); };
+    let badge='';
+    if(unavail) badge='<div class="badge unavail">Not this weekend</div>';
+    else if(o.rec) badge='<div class="badge">Recommended default</div>';
+    const deltaTxt = t>CEIL
+       ? `<span style="color:var(--bad)">${fmt(over)} over ceiling</span>`
+       : `<span style="color:var(--good)">${fmt(CEIL-t)} under ceiling</span>`;
+    el.innerHTML=`${badge}
+      <p class="name">${o.name}</p>
+      <p class="tag">${o.tag}</p>
+      <div class="price">${fmt(t)} <small>all-in</small></div>
+      <div class="delta">${deltaTxt}</div>
+      <ul class="lines">
+        <li><span>Airbnb, ${state.arrival==='wed'&&!o.edinburghOnly?'4':'5'} nt <em style="font-style:normal;color:var(--good)">live</em></span><span>${fmt(o.airbnb)}</span></li>
+        <li><span>Ground est. (car/food/local)</span><span>${fmt(o.ground)}</span></li>
+        <li><span>Flights (5, economy)</span><span>${fmt(o.flights)}</span></li>
+        ${state.pe?`<li><span>Premium econ ×2</span><span>+${fmt(PE)}</span></li>`:''}
+        ${state.chef?`<li><span>Chef night</span><span>+${fmt(CHEF)}</span></li>`:''}
+      </ul>
+      <div class="flags">${o.flags.map(f=>`<div class="flag ${f[0]}">${f[1]}</div>`).join('')}</div>
+      <button class="pickbtn">${state.sel===o.id?'✓ Picked':'Pick this'}</button>`;
+    grid.appendChild(el);
+  });
+}
+
+function dock(){
+  const o=opts.find(x=>x.id===state.sel);
+  const pn=document.getElementById('pickName'), tn=document.getElementById('totalNum'),
+        fill=document.getElementById('fill'), st=document.getElementById('statusTxt');
+  if(!o){pn.textContent='—';tn.textContent='—';fill.style.width='0';st.textContent='Choose a lane ↑';st.style.color='var(--mut)';return;}
+  const t=totalFor(o);
+  pn.textContent=o.name; tn.textContent=fmt(t);
+  const pct=Math.max(4,Math.min(100, (t/ (CEIL*1.18))*100));
+  fill.style.width=pct+'%';
+  if(t>CEIL){fill.style.background='var(--bad)';st.textContent='Over ceiling — needs sign-off';st.style.color='var(--bad)';}
+  else if(t<FLOOR){fill.style.background='var(--accent)';st.textContent='Under floor';st.style.color='var(--accent)';}
+  else {fill.style.background='var(--good)';st.textContent='In budget ✓';st.style.color='var(--good)';}
+}
+
+// weekend note
+function wknote(){
+  document.getElementById('wknote').innerHTML = state.wk==='early'
+    ? '⚠ Jul 23–26 is the tentative one — Johnny\'s traveling until the 26th, so Michelle\'s childcare for Veda is the open question this weekend. (Sofia is clear by now; her family was only visiting until ~Jul 19.) <b>Edinburgh is greyed out — it can\'t do this weekend.</b>'
+    : 'Default weekend — clears <b>both</b> personal constraints: it\'s after Johnny is back from traveling (Michelle\'s childcare) and after Sofia\'s family visit ends ~Jul 19. The earlier week of Jul 14 was dropped because Sofia had family in until the 19th. All four lanes available.';
+}
+
+function arrnote(){
+  document.getElementById('arrnote').innerHTML = state.arrival==='wed'
+    ? '✈ <b>Wednesday arrival</b> = 4 house-nights, not 5. Saves <b>~$820</b> (Glasgow) to <b>~$1,540</b> (Grange) on the house — but it\'s the only buffer Michelle + Tony get to shake off an eastbound redeye before Friday\'s deep-work day. Edinburgh\'s dates are fixed (Jul 27–Aug 1), so its price doesn\'t change.'
+    : '✈ <b>Tuesday arrival</b> (the plan): Michelle + Tony get ~1.5 days to reset the redeye and stock the house before the others land Thursday. House held 5 nights.';
+}
+
+// controls
+document.querySelectorAll('#wk button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#wk button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); state.wk=b.dataset.wk;
+  if(state.wk==='early' && state.sel==='edinburgh') state.sel=null;
+  wknote(); render(); dock();
+});
+document.querySelectorAll('#arr button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#arr button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); state.arrival=b.dataset.arr;
+  recompute(); arrnote(); render(); dock();
+});
+function chip(id,key){const c=document.getElementById(id);c.onclick=()=>{state[key]=!state[key];c.classList.toggle('on',state[key]);render();dock();};}
+chip('pe','pe'); chip('chef','chef');
+
+document.getElementById('risklist').innerHTML=`
+<p><b>Critical:</b> decision-delay is the #1 risk (fares, free-cancel windows, ETA timing all close together) · Grange zero-reviews when the house is the venue · US ETA required to board · transatlantic fares rise sharply inside 3 weeks · Edinburgh is over ceiling and the levy stacks on top · no agenda = expensive group hang.</p>
+<p><b>Should-fix:</b> deposit/cancellation exposure on a house held before the decision · single payer (CEO-only) stalls execution — add Michelle or a spend ceiling · Sofia's single CHQ connection needs ≥2.5–3 hr buffer on one ticket · Tom's origin still unconfirmed · Grange car/driver/insurance + does one car fit 5 + bags + groceries · self-catered grocery + delivery plan, pre-book 1–2 dinners, confirm dietary needs · buy trip insurance at first non-refundable booking.</p>
+<p><b>Nice-to-know:</b> confirm a real indoor shared workspace + heating · midges at Grange · rural connectivity fallback (EE coverage / hotspot / eSIM) · USD→GBP FX drift between deciding and paying · childcare check on the early weekend · passport validity.</p>`;
+
+recompute(); wknote(); arrnote(); render(); dock();
+</script>
+</body>
+</html>
