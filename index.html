@@ -88,11 +88,11 @@
 <body>
 <div class="wrap">
   <h1>Scotland Offsite — Pick a Lane</h1>
-  <p class="sub">5 people · Thu–Sun working long weekend · house held Tue–Sun (5 nights) · budget floor <b>$10K</b>, ceiling <b>$15K</b>. Toggle the upgrades and weekend; the total moves live. Tap a card to choose.</p>
+  <p class="sub">6 people (Lowell added) · Thu–Sun working long weekend · house held Tue–Sun (5 nights) · budget floor <b>$10K</b>, ceiling <b>$15K</b>. Toggle the upgrades and weekend; the total moves live. Tap a card to choose.</p>
 
   <div style="background:linear-gradient(90deg,rgba(63,185,80,.16),rgba(88,166,255,.10));border:1px solid var(--good);border-radius:14px;padding:14px 16px;margin-bottom:14px">
     <div style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--good);font-weight:800;margin-bottom:5px">▶ Recommendation</div>
-    <div style="font-size:14.5px;line-height:1.5">Hold it as a <b>leadership-only quarterly</b> (not regional) · <b>Glasgow</b> · <b>Jul 30 – Aug 2</b>. Glasgow is the genuine pick — best value-to-function for a working weekend and the only lane with room for a premium-economy upgrade under $15K — <b>not just this app's default</b>. The toggles below are for pressure-testing; the full 1:3:1 reasoning (hold-vs-defer, location, regional) is in the brief.</div>
+    <div style="font-size:14.5px;line-height:1.5"><b>Now 6 people</b> (Lowell in) — that adds a US long-haul (~+$1.2K) and a rooming wrinkle. <b>Glasgow ~$14K</b> stays the value pick and the recommendation, <b>if</b> one pair takes a twin room (it's 5-bed). If all six need a private room, only <b>Old Mill</b> (6-bed) delivers — but it tips ~$1K over the $15K ceiling (~$16K), a cap-flex call for Marvin. Full 1:3:1 reasoning in the brief.</div>
   </div>
 
   <div class="panel">
@@ -115,7 +115,7 @@
       <div>
         <div class="lbl">Upgrades</div>
         <div class="row">
-          <div class="chip" id="pe"><span class="box">✓</span> Premium economy <small>· 2 long-hauls (est +$1,900)</small></div>
+          <div class="chip" id="pe"><span class="box">✓</span> Premium economy <small>· 3 long-hauls (est +$2,850)</small></div>
           <div class="chip" id="chef"><span class="box">✓</span> Private chef night <small>· (est +$550)</small></div>
         </div>
       </div>
@@ -159,7 +159,7 @@
   </div>
 
   <p class="foot">
-    House prices are <b>live, fees-included totals pulled Jun 25, 2026</b> for the stay (Glasgow + Old Mill at Jul 28–Aug 2 on Airbnb; Dreghorn on Booking.com). Ground ($3,100) and flights ($3,450 economy) are planning estimates; so are the upgrades — premium-economy transatlantic upgrades and a private-chef dinner vary, confirm before relying on them. <b>Dreghorn is in the City of Edinburgh</b>, so the 5% visitor levy (~$200, live Jul 24, 2026) likely applies on top; Glasgow and Dalkeith are outside the council and are <b>not</b> levied. Re-pull prices right before booking. Sources: gov.uk/eta · edinburgh.gov.uk/visitorlevy.
+    House prices are <b>live, fees-included totals pulled Jun 25, 2026 at 6 guests</b> (Glasgow + Old Mill on Airbnb, Jul 28–Aug 2; Dreghorn on Booking.com). Ground (~$3,400) and flights (~$4,700 economy — now 3 US long-hauls incl. Lowell) are planning estimates; so are the upgrades. <b>Dreghorn is in the City of Edinburgh</b>, so the 5% visitor levy (~$200, live Jul 24, 2026) likely applies on top; Glasgow and Dalkeith are outside the council and are <b>not</b> levied. Re-pull prices right before booking. Sources: gov.uk/eta · edinburgh.gov.uk/visitorlevy.
   </p>
 </div>
 
@@ -175,24 +175,24 @@
 </div>
 
 <script>
-const PE=1900, CHEF=550, GROUND=3100, FLIGHTS=3450;
+const PE=2850, CHEF=550, GROUND=3400, FLIGHTS=4700;
 // airbnb = LIVE fees-included price pulled Jun 25, 2026 for the 5-night stay
 const opts=[
   {id:'glasgow', name:'Glasgow', tag:'City · value pick · flexible dates',
-    aTue:5898, aWed:5078, ground:GROUND, flights:FLIGHTS, rec:true, edinburghOnly:false,
-    flags:[['g','Live price $5,898 all-in (5 nt) — Guest Favourite ★4.91, 174 reviews. Free cancellation before Jul 23.'],
+    aTue:5918, aWed:5098, ground:GROUND, flights:FLIGHTS, rec:true, edinburghOnly:false,
+    flags:[['g','Live price $5,918 (5 nt, 6 guests) — Guest Favourite ★4.91, 174 reviews. Free cancellation before Jul 23.'],
            ['g','Walkable city, trains everywhere — no car needed.'],
-           ['g','Cheapest lane; the only one with room for an upgrade under $15K.']]},
+           ['y','5 BR / 8 beds — at 6 people one pair shares a room (twin). No headroom for upgrades now (~$14K).']]},
   {id:'oldmill', name:'Old Mill, Dalkeith', tag:'Premium house · ~20 min from Edinburgh',
     aTue:7919, aWed:6675, ground:GROUND, flights:FLIGHTS, rec:false, edinburghOnly:false,
-    flags:[['g','Live price $7,919 all-in (down from $9,767) — Superhost ★5.0. Eskbank rail + buses, car optional.'],
-           ['g','CHEAPER on Booking.com: same house ~$6,693 (save ~$1,200). Confirm identical property + dates before booking there.'],
+    flags:[['g','6 BR / 6.5 baths — the ONLY house where all six get a private room. Superhost ★5.0, car optional.'],
+           ['r','At 6 people it tips ~$1K OVER the $15K ceiling (~$16K) — a cap-flex call for Marvin. (Book it ~$1,200 cheaper on Booking.com: $6,693.)'],
            ['g','Outside Edinburgh council = no visitor levy.']]},
   {id:'dreghorn', name:'Dreghorn House', tag:'Edinburgh · budget in-city · 5 BR',
     aTue:3944, aWed:3329, ground:GROUND, flights:FLIGHTS, rec:false, edinburghOnly:false,
-    flags:[['g','Cheapest 5-bed found — gets you Edinburgh proper, on budget. Live price $3,944 all-in (Booking.com, fees incl.).'],
-           ['y','★7.6 (32 reviews), only 2 baths for 5 — functional, not premium. +5% Edinburgh levy (~$200) likely on top.'],
-           ['y','Kills the "Edinburgh = $17K" myth — the postcode isn\'t the cost, the polish is.']]}
+    flags:[['g','Cheapest option — Edinburgh proper, on budget (~$12.2K all-in at 6). Live price $3,944 (Booking.com, fees incl.).'],
+           ['y','5 BR / 9 beds — at 6 one pair shares. ★7.6, 2 showers + 1 bath for six — functional, not premium. +5% levy (~$200).'],
+           ['g','Most budget headroom of the three — kills the "Edinburgh = $17K" myth.']]}
 ];
 function recompute(){ opts.forEach(o=>{ o.airbnb=(state.arrival==='wed'?o.aWed:o.aTue); o.base=o.airbnb+o.ground+o.flights; }); }
 
@@ -226,7 +226,7 @@ function render(){
       <ul class="lines">
         <li><span>House, ${state.arrival==='wed'&&!o.edinburghOnly?'4':'5'} nt <em style="font-style:normal;color:var(--good)">live</em></span><span>${fmt(o.airbnb)}</span></li>
         <li><span>Ground est. (car/food/local)</span><span>${fmt(o.ground)}</span></li>
-        <li><span>Flights (5, economy)</span><span>${fmt(o.flights)}</span></li>
+        <li><span>Flights (6, economy)</span><span>${fmt(o.flights)}</span></li>
         ${state.pe?`<li><span>Premium econ ×2</span><span>+${fmt(PE)}</span></li>`:''}
         ${state.chef?`<li><span>Chef night</span><span>+${fmt(CHEF)}</span></li>`:''}
       </ul>
